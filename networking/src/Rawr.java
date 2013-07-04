@@ -1,12 +1,17 @@
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
@@ -17,6 +22,7 @@ public class Rawr extends JFrame implements ActionListener  {
 	ChatClient client;
 	JTextArea pane;
 	JTextField field;
+	private JScrollPane scroll;
 	
 
 	public static void main(String[] args){
@@ -27,46 +33,53 @@ public class Rawr extends JFrame implements ActionListener  {
 		
 		super("Rawr Instant Messenger");
 		setSize(new Dimension(400,600));
-		setLayout(new FlowLayout());
+		setLayout(new BorderLayout());
+		
 		client = new ChatClient();
+		
 		initialize();
+		
+		Timer t = new Timer();
+		t.scheduleAtFixedRate(new UpdateTask(), 0, 100);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 	}
 
 	private void initialize() {
-		JPanel messagePanel = new JPanel();
-		pane = new JTextArea(30,40);
-		pane.setEditable(false);
-		messagePanel.add(pane);
-		add(messagePanel);
+		pane = new JTextArea(30,30);
+		scroll = new JScrollPane(pane);
+		add(scroll, BorderLayout.CENTER);
 		
 		
-		
-		
-		JPanel submitPanel = new JPanel();
-		submitPanel.setLayout(new FlowLayout());
 		field = new JTextField(20);
-		submitPanel.add(field);
-		JButton button = new JButton("send");
-		button.setActionCommand("submit");
-		button.addActionListener(this);
-		submitPanel.add(button);
-		add(submitPanel);
+		field.addActionListener(this);
+		add(field, BorderLayout.SOUTH);
 	}
 	
 	public void update() {
-		String contents = pane.getText();
-		pane.setText(client.getUpdate(0));
+		String update = client.getUpdate();
+		while (! update.equals("")){
+			String contents = pane.getText();
+			pane.setText(update + contents);
+			update= client.getUpdate();
+		}
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getActionCommand().equals("submit")) {
+		if (e.getSource()== field) {
 			String message = field.getText();
-			client.submit(message);
+			if (! message.equals("")) {
+				client.submit(message);
+			}
 			field.setText("");
-			update();
 			//tell my model to submit
 		}
 	}
-}
+	class UpdateTask extends TimerTask {
+		public void run(){
+			update();
+			}
+
+		}
+	}
