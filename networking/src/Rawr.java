@@ -18,27 +18,27 @@ import javax.swing.JTextPane;
 
 
 public class Rawr extends JFrame implements ActionListener  {
-	
+
 	ChatClient client;
 	JTextArea pane;
 	JTextField field;
 	private JScrollPane scroll;
-	
+
 
 	public static void main(String[] args){
-	new Rawr();
-}
-	
+		new Rawr();
+	}
+
 	public Rawr() {
-		
+
 		super("Rawr Instant Messenger");
 		setSize(new Dimension(400,600));
 		setLayout(new BorderLayout());
-		
+
 		client = new ChatClient();
-		
+
 		initialize();
-		
+
 		Timer t = new Timer();
 		t.scheduleAtFixedRate(new UpdateTask(), 0, 100);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -49,13 +49,13 @@ public class Rawr extends JFrame implements ActionListener  {
 		pane = new JTextArea(30,30);
 		scroll = new JScrollPane(pane);
 		add(scroll, BorderLayout.CENTER);
-		
-		
+
+
 		field = new JTextField(20);
 		field.addActionListener(this);
 		add(field, BorderLayout.SOUTH);
 	}
-	
+
 	public void update() {
 		String update = client.getUpdate();
 		while (! update.equals("")){
@@ -79,7 +79,7 @@ public class Rawr extends JFrame implements ActionListener  {
 	class UpdateTask extends TimerTask {
 		public void run(){
 			update();
-			}
-
 		}
+
 	}
+}
